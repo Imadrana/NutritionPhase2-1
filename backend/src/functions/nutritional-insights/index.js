@@ -24,6 +24,7 @@ app.http('getNutritionalInsights', {
                     }
                 },
                 headers: {
+                    'Content-Type': 'application/json', // Added this line
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -38,6 +39,7 @@ app.http('getNutritionalInsights', {
                     details: error.message 
                 },
                 headers: {
+                    'Content-Type': 'application/json', // Added this line
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -75,3 +77,5 @@ function calculateAverage(records, nutrient) {
     const total = records.reduce((sum, record) => sum + parseFloat(record[nutrient] || 0), 0);
     return Math.round(total / records.length);
 }
+
+module.exports = app;

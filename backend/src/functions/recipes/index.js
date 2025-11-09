@@ -24,6 +24,7 @@ app.http('getRecipes', {
                     }
                 },
                 headers: {
+                    'Content-Type': 'application/json', // Added this line
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -38,6 +39,7 @@ app.http('getRecipes', {
                     details: error.message 
                 },
                 headers: {
+                    'Content-Type': 'application/json', // Added this line
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -62,3 +64,5 @@ function processRecipeData(records, dietType) {
 
     return Object.entries(dietTypeCounts).map(([name, value]) => ({ name, value }));
 }
+
+module.exports = app;

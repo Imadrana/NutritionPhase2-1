@@ -24,6 +24,7 @@ app.http('getClusters', {
                     }
                 },
                 headers: {
+                    'Content-Type': 'application/json', // Added this line
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -38,6 +39,7 @@ app.http('getClusters', {
                     details: error.message 
                 },
                 headers: {
+                    'Content-Type': 'application/json', // Added this line
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -114,3 +116,5 @@ function calculateCorrelation(records, nutrient1, nutrient2) {
     // Round to 2 decimal places
     return Math.round(correlation * 100) / 100;
 }
+
+module.exports = app;
