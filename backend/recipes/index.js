@@ -1,5 +1,5 @@
 const { app } = require('@azure/functions');
-const dataProcessing = require('../utils/dataProcessing');
+const dataProcessing = require('../src/functions/utils/dataProcessing');
 
 app.http('getRecipes', {
     methods: ['GET'],
@@ -68,3 +68,16 @@ function processRecipeData(records, dietType) {
 }
 
 module.exports = app;
+module.exports = async function (context, req) {
+  try {
+    const diet = (req.query.diet || 'all').toLowerCase();
+    context.res = {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: { ok: true, function: context.executionContext.functionName, diet }
+    };
+  } catch (err) {
+    context.log.error(err);
+    context.res = { status: 500, body: { error: err.message } };
+  }
+};
