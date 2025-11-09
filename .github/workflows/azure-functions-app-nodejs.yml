@@ -15,8 +15,27 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
+
+    - name: Show Node.js and npm versions
+      run: |
+        node --version
+        npm --version
+
+    - name: Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm install
         
-    # Manual build steps are removed. The SWA deploy action handles this automatically now.
+    - name: List installed packages
+      run: |
+        cd frontend
+        npm list
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm run build
+        ls dist  # List contents of dist folder
 
     - name: Deploy to Azure Static Web Apps
       id: builddeploy
@@ -25,9 +44,5 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         action: "upload"
-        # Location of your main application source code (frontend)
-        app_location: "frontend" 
-        # Location of your built application output (e.g., 'dist' or 'build')
+        app_location: "frontend"
         output_location: "dist"
-        # Location of your Azure Functions code (backend)
-        api_location: "backend" 
