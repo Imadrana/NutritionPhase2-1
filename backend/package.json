@@ -1,0 +1,17 @@
+{
+  "name": "nutritional-insights-backend",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "func start",
+    "build": "npm install"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.9.0",
+    "@azure/storage-blob": "^12.29.1",
+    "csv-parse": "^5.5.6"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.x"
+  }
+}

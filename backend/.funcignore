@@ -1,0 +1,6 @@
+.git*
+.vscode
+__azurite_*__.json
+__debug_bin
+node_modules
+.env
