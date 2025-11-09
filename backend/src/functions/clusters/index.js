@@ -1,4 +1,7 @@
+// Ensure you are using Node.js v4 programming model conventions.
+
 const { app } = require('@azure/functions');
+// Make sure the path to your utils file is correct
 const dataProcessing = require('../utils/dataProcessing');
 
 app.http('getClusters', {
@@ -7,6 +10,7 @@ app.http('getClusters', {
     handler: async (request, context) => {
         context.log('Get Clusters Function triggered');
         const startTime = Date.now();
+        // Use request.query.get() for v4 model
         const dietType = request.query.get('dietType') || 'All Diet Types';
 
         try {
@@ -16,6 +20,7 @@ app.http('getClusters', {
             // Process cluster data
             const clusterData = processClusterData(records, dietType);
 
+            // In V4 model, the 'jsonBody' property handles serialization and content type automatically.
             return {
                 jsonBody: {
                     data: clusterData,
@@ -26,7 +31,7 @@ app.http('getClusters', {
                     }
                 },
                 headers: {
-                    'Content-Type': 'application/json',
+                    // Content-Type is set automatically for jsonBody
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -41,7 +46,6 @@ app.http('getClusters', {
                     details: error.message 
                 },
                 headers: {
-                    'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -119,7 +123,12 @@ function calculateCorrelation(records, nutrient1, nutrient2) {
     return Math.round(correlation * 100) / 100;
 }
 
-module.exports = app;
+
+// The following conflicting lines have been removed:
+
+/* 
+module.exports = app; 
+
 module.exports = async function (context, req) {
   try {
     const diet = (req.query.diet || 'all').toLowerCase();
@@ -133,3 +142,4 @@ module.exports = async function (context, req) {
     context.res = { status: 500, body: { error: err.message } };
   }
 };
+*/
