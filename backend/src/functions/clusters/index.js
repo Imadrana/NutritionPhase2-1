@@ -1,7 +1,4 @@
-// Ensure you are using Node.js v4 programming model conventions.
-
 const { app } = require('@azure/functions');
-// Make sure the path to your utils file is correct
 const dataProcessing = require('../utils/dataProcessing');
 
 app.http('getClusters', {
@@ -10,17 +7,13 @@ app.http('getClusters', {
     handler: async (request, context) => {
         context.log('Get Clusters Function triggered');
         const startTime = Date.now();
-        // Use request.query.get() for v4 model
         const dietType = request.query.get('dietType') || 'All Diet Types';
 
         try {
-            // Fetch data from Azure Blob Storage
             const records = await dataProcessing.getDataFromBlob();
 
-            // Process cluster data
             const clusterData = processClusterData(records, dietType);
 
-            // In V4 model, the 'jsonBody' property handles serialization and content type automatically.
             return {
                 jsonBody: {
                     data: clusterData,
@@ -31,7 +24,6 @@ app.http('getClusters', {
                     }
                 },
                 headers: {
-                    // Content-Type is set automatically for jsonBody
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET',
                     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -122,24 +114,3 @@ function calculateCorrelation(records, nutrient1, nutrient2) {
     // Round to 2 decimal places
     return Math.round(correlation * 100) / 100;
 }
-
-
-// The following conflicting lines have been removed:
-
-/* 
-module.exports = app; 
-
-module.exports = async function (context, req) {
-  try {
-    const diet = (req.query.diet || 'all').toLowerCase();
-    context.res = {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: { ok: true, function: context.executionContext.functionName, diet }
-    };
-  } catch (err) {
-    context.log.error(err);
-    context.res = { status: 500, body: { error: err.message } };
-  }
-};
-*/
