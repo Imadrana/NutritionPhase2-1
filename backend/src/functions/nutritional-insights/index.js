@@ -1,5 +1,5 @@
 const { app } = require('@azure/functions');
-const dataProcessing = require('../src/functions/utils/dataProcessing');
+const dataProcessing = require('../utils/dataProcessing');
 
 app.http('getNutritionalInsights', {
     methods: ['GET'],
