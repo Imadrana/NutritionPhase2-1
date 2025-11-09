@@ -1,47 +1,42 @@
 name: Azure Web App Deployment
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-    
+
     - name: Show Node.js and npm versions
       run: |
         node --version
         npm --version
-    
+
     - name: Install Frontend Dependencies
       run: |
         cd frontend
         npm install
         
-    - name: Install Backend Dependencies
+    - name: List installed packages
       run: |
-        cd backend
-        npm install
-    
+        cd frontend
+        npm list
+
     - name: Build Frontend
       run: |
         cd frontend
         npm run build
         ls dist  # List contents of dist folder
-    
-    - name: Deploy Backend Azure Functions
-      uses: Azure/functions-action@v1
-      with:
-        app-name: nutrition-insights-fnc-01
-        package: ./backend
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-    
+
     - name: Deploy to Azure Static Web Apps
       id: builddeploy
       uses: Azure/static-web-apps-deploy@v1
