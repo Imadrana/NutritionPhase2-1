@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Explicitly set Node.js 20
+          node-version: '20'
 
       - name: Build Frontend
         working-directory: ./frontend
@@ -46,6 +46,9 @@ jobs:
           app_location: "/frontend" 
           api_location: "/backend"
           output_location: "dist"
+          # Add these lines to explicitly configure Node.js function app
+          api_build_command: "npm install"
+          skip_api_build: false
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
