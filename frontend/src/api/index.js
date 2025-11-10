@@ -1,8 +1,25 @@
-import axios from "axios";
+import { app } from "@azure/functions";
 
-// Create a reusable axios instance
-const api = axios.create({
-  baseURL: import.meta.env.VITE_AZURE_FUNCTION_URL // <- reads from .env file
+app.http("getnutritionalinsights", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "getnutritionalinsights",
+}, async (req, ctx) => {
+  return { jsonBody: { ok: true, route: "getnutritionalinsights" } };
 });
 
-export default api;
+app.http("getrecipes", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "getrecipes",
+}, async (req, ctx) => {
+  return { jsonBody: { ok: true, route: "getrecipes" } };
+});
+
+app.http("getclusters", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "getclusters",
+}, async (req, ctx) => {
+  return { jsonBody: { ok: true, route: "getclusters" } };
+});
