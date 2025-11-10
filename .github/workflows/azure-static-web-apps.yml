@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '20'  # Explicitly set Node.js 20
 
       - name: Build Frontend
         working-directory: ./frontend
@@ -34,6 +34,7 @@ jobs:
         working-directory: ./backend
         run: |
           npm install
+          npm run build
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
