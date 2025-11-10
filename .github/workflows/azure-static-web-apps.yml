@@ -34,7 +34,6 @@ jobs:
         working-directory: ./backend
         run: |
           npm install
-          npm run build
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -46,9 +45,7 @@ jobs:
           app_location: "/frontend" 
           api_location: "/backend"
           output_location: "dist"
-          # Add these lines to explicitly configure Node.js function app
-          api_build_command: "npm install"
-          skip_api_build: false
+          api_language: "node"  # Explicitly specify Node.js
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
