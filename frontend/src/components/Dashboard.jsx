@@ -1,27 +1,33 @@
-import React, { useState, useEffect } from "react";
-import api from "../api"; // <-- use the axios instance (reads VITE_AZURE_FUNCTION_URL)
-import "./Dashboard.css";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip,
-  PieChart, Pie, LineChart, Line, Legend,
-  ResponsiveContainer, ScatterChart, Scatter, ZAxis
-} from "recharts";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './Dashboard.css';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  PieChart, 
+  Pie, 
+  LineChart, 
+  Line, 
+  Legend, 
+  ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  ZAxis
+} from 'recharts';
 
 function NutritionalDashboard() {
   const [nutritionalData, setNutritionalData] = useState(null);
   const [recipeData, setRecipeData] = useState(null);
   const [clustersData, setClustersData] = useState(null);
   const [executionTime, setExecutionTime] = useState(null);
-  const [dietType, setDietType] = useState("All Diet Types");
+  const [dietType, setDietType] = useState('All Diet Types');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Use LOWERCASE routes unless your Function explicitly sets a camelCase `route:`
-  const ROUTES = {
-    insights: "/getnutritionalinsights",
-    recipes: "/getrecipes",
-    clusters: "/getclusters",
-  };
+  const API_URL = import.meta.env.VITE_AZURE_FUNCTION_URL;
 
   const fetchData = async (selectedDietType = dietType) => {
     setLoading(true);
@@ -29,62 +35,116 @@ function NutritionalDashboard() {
     const startTime = performance.now();
 
     try {
-      const params = { dietType: selectedDietType };
+      console.log('Fetching data from:', API_URL);
+      console.log('Diet Type:', selectedDietType);
 
-      // Do requests in parallel
-      const [nutritionalRes, recipeRes, clustersRes] = await Promise.all([
-        api.get(ROUTES.insights, { params }),
-        api.get(ROUTES.recipes, { params }),
-        api.get(ROUTES.clusters, { params }),
-      ]);
+      const nutritionalResponse = await axios.get(
+        `${API_URL}/getNutritionalInsights`, 
+        { 
+          params: { dietType: selectedDietType },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
 
-      const nut = nutritionalRes?.data?.data ?? null;
-      const rec = recipeRes?.data?.data ?? null;
-      const clu = clustersRes?.data?.data ?? null;
+      const recipeResponse = await axios.get(
+        `${API_URL}/getRecipes`, 
+        { 
+          params: { dietType: selectedDietType },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
 
-      setNutritionalData(Array.isArray(nut) && nut.length ? nut : null);
-      setRecipeData(Array.isArray(rec) && rec.length ? rec : null);
-      setClustersData(Array.isArray(clu) && clu.length ? clu : null);
+      const clustersResponse = await axios.get(
+        `${API_URL}/getClusters`, 
+        { 
+          params: { dietType: selectedDietType },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
 
+      // Validate data before setting state
+      if (!nutritionalResponse.data.data || nutritionalResponse.data.data.length === 0) {
+        console.warn('No nutritional data found for selected diet type');
+        setNutritionalData(null);
+      } else {
+        setNutritionalData(nutritionalResponse.data.data);
+      }
+
+      if (!recipeResponse.data.data || recipeResponse.data.data.length === 0) {
+        console.warn('No recipe data found for selected diet type');
+        setRecipeData(null);
+      } else {
+        setRecipeData(recipeResponse.data.data);
+      }
+
+      if (!clustersResponse.data.data || clustersResponse.data.data.length === 0) {
+        console.warn('No clusters data found for selected diet type');
+        setClustersData(null);
+      } else {
+        setClustersData(clustersResponse.data.data);
+      }
+
+      const endTime = performance.now();
+      
       setDietType(selectedDietType);
-      setExecutionTime(performance.now() - startTime);
-    } catch (e) {
-      console.error("Fetch error:", e?.response?.data ?? e);
-      setError(`Failed to fetch data: ${e.message}`);
+      setExecutionTime(endTime - startTime);
+    } catch (error) {
+      console.error('Detailed Fetch Error:', {
+        message: error.message,
+        response: error.response ? error.response.data : 'No response',
+        config: error.config
+      });
+      setError(`Failed to fetch data: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   if (loading) return <div>Loading...</div>;
-  if (error)   return <div style={{ color: "red" }}>Error: {error}</div>;
+  if (error) return <div style={{color: 'red'}}>Error: {error}</div>;
 
   return (
     <div className="nutritional-dashboard">
       <div className="dashboard-header">
         <h1>Nutritional Insights Dashboard</h1>
       </div>
-
+      
       <div className="dashboard-controls">
-        <select
-          value={dietType}
+        <select 
+          value={dietType} 
           onChange={(e) => fetchData(e.target.value)}
           className="diet-type-select"
         >
-          {["All Diet Types", "Vegan", "Paleo", "Keto", "Mediterranean"].map((t) => (
-            <option key={t} value={t}>{t}</option>
+          {['All Diet Types', 'Vegan', 'Paleo', 'Keto', 'Mediterranean'].map(type => (
+            <option key={type} value={type}>{type}</option>
           ))}
         </select>
-
-        <button onClick={() => fetchData()} className="refresh-button">
+        
+        <button 
+          onClick={() => fetchData()} 
+          className="refresh-button"
+        >
           Refresh Data
         </button>
       </div>
 
       {executionTime && (
-        <p className="execution-time">Last fetch took: {executionTime.toFixed(2)} ms</p>
+        <p className="execution-time">
+          Last fetch took: {executionTime.toFixed(2)} ms
+        </p>
       )}
 
       <div className="charts-container">
@@ -96,7 +156,7 @@ function NutritionalDashboard() {
                 <XAxis dataKey="nutrient" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" />
+                <Bar dataKey="value" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -112,7 +172,13 @@ function NutritionalDashboard() {
             <h3>Recipe Distribution</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={recipeData} dataKey="value" nameKey="name" label />
+                <Pie 
+                  data={recipeData} 
+                  dataKey="value" 
+                  nameKey="name" 
+                  fill="#82ca9d"
+                  label
+                />
                 <Tooltip />
                 <Legend />
               </PieChart>
@@ -133,8 +199,8 @@ function NutritionalDashboard() {
                 <XAxis type="number" dataKey={1} name="Protein" />
                 <YAxis type="number" dataKey={2} name="Carbs" />
                 <ZAxis type="number" dataKey={3} name="Fat" />
-                <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-                <Scatter name="Nutritional Correlations" data={clustersData} />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                <Scatter name="Nutritional Correlations" data={clustersData} fill="#8884d8" />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
